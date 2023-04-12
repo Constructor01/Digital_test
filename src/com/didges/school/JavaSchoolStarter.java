@@ -7,7 +7,8 @@ public class JavaSchoolStarter {
     public JavaSchoolStarter() {
     }
 
-    private List<Map<String, Object>> DataBase = new ArrayList<>();
+
+    public List<Map<String, Object>> DataBase = new ArrayList<>();
 
     //На вход запрос, на выход результат выполнения запроса
     public List<Map<String, Object>> execute(String request) throws Exception {
@@ -28,20 +29,22 @@ public class JavaSchoolStarter {
         //String sssss="(?i)insert";
         //находим нужный нам запрос
         String req_type = new String(req);
-        if (req_type.matches("[Ii][Nn][Ss][Ee][Rr][Tt]")) {
-            return INSERT(request);
-        } else if (req_type.matches("[Uu][Pp][Dd][Aa][Tt][Ee]")) {
+        if (req_type.matches("(?i)insert")) {
+            return INSERT2(request);
+        } else if (req_type.matches("(?i)update")) {
             return UPDATE(request);
-        } else if (req_type.matches("[Dd][Ee][Ll][Ee][Tt][Ee]")) {
+        } else if (req_type.matches("(?i)delete")) {
             return DELETE(request);
-        } else if (req_type.matches("[Se][Ee][Ll][Ee][Cc][Tt]")) {
+        } else if (req_type.matches("(?i)select")) {
             return SELECT(request);
         } else {
             throw new Exception();
         }
     }
 
-    private List<Map<String, Object>> INSERT(String request) throws Exception {
+
+
+    private List<Map<String, Object>> INSERT2(String request) throws Exception{
         Map<String, Object> row = new HashMap<>();
         int i = 0;
 
@@ -53,168 +56,211 @@ public class JavaSchoolStarter {
         while (request.charAt(i) != ' ') {
             i++;
         }
-
-        //проходим values
         while (request.charAt(i) == ' ') {
             i++;
         }
-        while (request.charAt(i) != ' ') {
+        //проверяем что слово VALUES
+        StringBuilder req = new StringBuilder();
+        for (int j = 0; request.charAt(i) != ' '; j++) {
+            req.insert(j, request.charAt(i));
             i++;
-        }
-
-        //идем до начала 1 запроса
-        while (request.charAt(i) == ' ') {
-            i++;
-        }
-
-        //обрабатываем все значения в цикле
-        while (request.length() != i) {
-            //находим 1 верхнюю '
-            while (request.charAt(i) != '\'') {
-                i++;
-            }
-            int index1 = i;//первая кавычка
-            i++;
-            //находим 2 верхнюю '
-            while (request.charAt(i) != '\'') {
-                i++;
-            }
-            int index2 = i;
-            //название столбца
-            String column_name = request.substring(index1 + 1, index2);
-            while (request.charAt(i) != '=') {
-                i++;
-            }
-            i++;
-            if (column_name.matches("[Ll][Aa][Ss][Tt][Nn][Aa][Mm][Ee]")) {//если lastname
-                //находим 1 верхнюю '
-                while (request.charAt(i) != '\'') {
-                    i++;
-                }
-                int ind1 = i;//первая кавычка
-                i++;
-                //находим 2 верхнюю '
-                while (request.charAt(i) != '\'') {
-                    i++;
-                }
-                int ind2 = i;
-                //название столбца
-                String stroke_name = request.substring(ind1 + 1, ind2);
-                row.put("lastName", stroke_name);
-                //верно оформлена
-            } else if (column_name.matches("[Aa][Gg][Ee]")) {//если age
-                while (request.charAt(i) == ' ') {
-                    i++;
-                }
-                int ind1 = i;
-                while (request.charAt(i) != ' ' && request.charAt(i) != ',') {
-                    i++;
-                    if (i == request.length()) {
-                        break;
-                    }
-                }
-                int ind2 = i;
-                String stroke_name = request.substring(ind1, ind2);
-                long age = Long.parseLong(stroke_name);
-                row.put("age", age);
-
-            } else if (column_name.matches("[Cc][Oo][Ss][Tt]")) {//если cost
-                while (request.charAt(i) == ' ') {
-                    i++;
-                }
-                int ind1 = i;
-                while (request.charAt(i) != ' ' && request.charAt(i) != ',') {
-                    i++;
-                    if (i == request.length()) {
-                        break;
-                    }
-                }
-                int ind2 = i;
-                String stroke_name = request.substring(ind1, ind2);
-                Double cost = Double.parseDouble(stroke_name);
-                row.put("cost", cost);
-            } else if (column_name.matches("[Ii][Dd]")) {//если id
-                while (request.charAt(i) == ' ') {
-                    i++;
-                }
-                int ind1 = i;
-                while (request.charAt(i) != ' ' && request.charAt(i) != ',') {
-                    i++;
-                    if (i == request.length()) {
-                        break;
-                    }
-                }
-                int ind2 = i;
-                String stroke_name = request.substring(ind1, ind2);
-                long id = Long.parseLong(stroke_name);
-                row.put("id", id);
-            } else if (column_name.matches("[Aa][Cc][Tt][Ii][Vv][Ee]")) {//если action
-                while (request.charAt(i) == ' ') {
-                    i++;
-                }
-                int ind1 = i;
-                while (request.charAt(i) != ' ' && request.charAt(i) != ',') {
-                    i++;
-                    if (i == request.length()) {
-                        break;
-                    }
-                }
-                int ind2 = i;
-                String stroke_name = request.substring(ind1, ind2);
-                Boolean active = Boolean.parseBoolean(stroke_name);
-                row.put("active", active);
-            } else {//если столбец не соответсвует формату то ошибку
-                throw new Exception();
-            }
-            //конец проверок
-            if (i >= request.length()) {
+            if (j == request.length() - 1) {
                 break;
             }
-            while (request.charAt(i) != ',') {
-                i++;
-                if (i >= request.length()) {
-                    break;
-                }
-            }
         }
-        /*Set <String> sss=row.keySet();
-        for(String aa:sss){
-            System.out.println(aa+" "+row.get(aa));
-        }*/
+        String s_val=new String(req);
+        if(!s_val.matches("(?i)values")){
+            throw new Exception();
+        }
+        row=ParseString.InfoRow(request.substring(i));
         DataBase.add(row);
-        return DataBase;
+        List<Map<String, Object>> DB = new ArrayList<>();
+        DB.add(row);
+        return DB;
     }
-
     private List<Map<String, Object>> UPDATE(String request) throws Exception {
         int i = 0;
-
         //проходы пишутся с учетом, того что могут быть лишние пробелы где угодно, в начале, в конце или между значениями.
-        //проходим insert
         while (request.charAt(i) == ' ') {
             i++;
         }
         while (request.charAt(i) != ' ') {
             i++;
         }
-
-        //проходим values
         while (request.charAt(i) == ' ') {
             i++;
         }
-        while (request.charAt(i) != ' ') {
+        //проверяем что слово VALUES
+        StringBuilder req = new StringBuilder();
+        for (int j = 0; request.charAt(i) != ' '; j++) {
+            req.insert(j, request.charAt(i));
+            i++;
+            if (j == request.length() - 1) {
+                break;
+            }
+        }
+        String s_val=new String(req);
+        if(!s_val.matches("(?i)values")){
+            throw new Exception();
+        }
+        int start=i;
+        boolean have_where=false;
+        // where
+        while(i+5!=request.length()){
+            if(request.substring(i,i+5).matches("(?i)where")){
+                have_where=true;
+                break;
+            }
             i++;
         }
 
-        return new ArrayList<>();
+        if(have_where){
+
+            List<Map<String, Object>> DB = new ArrayList<>();
+            String after_where=request.substring(i+5);
+            String befor_where=request.substring(start,i);
+            for(int k=0; k<DataBase.size();k++){
+                if(ParseString.TrueFalse(DataBase.get(k),after_where)){
+                    Map<String, Object> row = new HashMap<>();
+                    row=ParseString.InfoRow(befor_where);
+                    if(row.get("lastName")!=null){
+                        DataBase.get(k).put("lastName",row.get("lastName"));
+                    }
+                    if(row.get("id")!=null){
+                        DataBase.get(k).put("id",row.get("id"));
+                    }
+                    if(row.get("age")!=null){
+                        DataBase.get(k).put("age",row.get("age"));
+                    }
+                    if(row.get("cost")!=null){
+                        DataBase.get(k).put("cost",row.get("cost"));
+                    }
+                    if(row.get("active")!=null){
+                        DataBase.get(k).put("active",row.get("active"));
+                    }
+                    DB.add(row);
+                }
+            }
+            return DB;
+        }else{
+            String befor_where=request.substring(start);
+            for(int k=0; k<DataBase.size();i++){
+                Map<String, Object> row = new HashMap<>();
+                row=ParseString.InfoRow(befor_where);
+                if(row.get("lastName")!=null){
+                    DataBase.get(k).put("lastName",row.get("lastName"));
+                }
+                if(row.get("id")!=null){
+                    DataBase.get(k).put("id",row.get("id"));
+                }
+                if(row.get("age")!=null){
+                    DataBase.get(k).put("age",row.get("age"));
+                }
+                if(row.get("cost")!=null){
+                    DataBase.get(k).put("cost",row.get("cost"));
+                }
+                if(row.get("active")!=null){
+                    DataBase.get(k).put("active",row.get("active"));
+                }
+            }
+            return DataBase;
+        }
     }
 
     private List<Map<String, Object>> DELETE(String request) throws Exception {
-
-        return new ArrayList<>();
+        List<Map<String, Object>> result=new ArrayList<>();
+        int i = 0;
+        //проходы пишутся с учетом, того что могут быть лишние пробелы где угодно, в начале, в конце или между значениями.
+        while (request.charAt(i) == ' ') {
+            i++;
+        }
+        while (request.charAt(i) != ' ') {
+            i++;
+        }
+        while (request.charAt(i) == ' ') {
+            i++;
+            if(request.length()==i){
+                break;
+            }
+        }
+        //если нет where
+        if(request.length()==i){
+            List<Map<String, Object>> DB=new ArrayList<>();
+            Collections.copy(DB,DataBase);
+            DataBase.clear();
+            return DB;
+        }
+        //проверяем что слово WHERE
+        StringBuilder req = new StringBuilder();
+        for (int j = 0; request.charAt(i) != ' '; j++) {
+            req.insert(j, request.charAt(i));
+            i++;
+            if (j == request.length() - 1) {
+                break;
+            }
+        }
+        String s_val=new String(req);
+        if(!s_val.matches("(?i)WHERE")){
+            throw new Exception();
+        }
+        String inform=request.substring(i);
+        //System.out.println(inform);
+        for(int k=0; k<DataBase.size();k++){
+            if(ParseString.TrueFalse(DataBase.get(k),inform)){
+                //System.out.println(ParseString.TrueFalse(DataBase.get(k),inform));
+                result.add(DataBase.get(k));
+                DataBase.remove(k);
+                k--;
+            }
+        }
+        return result;
     }
 
     private List<Map<String, Object>> SELECT(String request) throws Exception {
-
-        return new ArrayList<>();
+        List<Map<String, Object>> result=new ArrayList<>();
+        int i = 0;
+        //проходы пишутся с учетом, того что могут быть лишние пробелы где угодно, в начале, в конце или между значениями.
+        while (request.charAt(i) == ' ') {
+            i++;
+        }
+        while (request.charAt(i) != ' ') {
+            i++;
+            if(request.length()==i){
+                break;
+            }
+        }
+        if(request.length()==i){
+            return DataBase;
+        }
+        while (request.charAt(i) == ' ') {
+            i++;
+            if(request.length()==i){
+                break;
+            }
+        }
+        //если нет where
+        if(request.length()==i){
+            return DataBase;
+        }
+        //проверяем что слово WHERE
+        StringBuilder req = new StringBuilder();
+        for (int j = 0; request.charAt(i) != ' '; j++) {
+            req.insert(j, request.charAt(i));
+            i++;
+            if (j == request.length() - 1) {
+                break;
+            }
+        }
+        String s_val=new String(req);
+        if(!s_val.matches("(?i)WHERE")){
+            throw new Exception();
+        }
+        String inform=request.substring(i);
+        for(int k=0; k<DataBase.size();k++){
+            if(ParseString.TrueFalse(DataBase.get(k),inform)){
+                result.add(DataBase.get(k));
+            }
+        }
+        return result;
     }
 }
